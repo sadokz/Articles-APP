@@ -4,3 +4,5 @@ asyncpg
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt<4.0.0
+python-dotenv

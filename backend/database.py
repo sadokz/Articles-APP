@@ -1,8 +1,14 @@
 import os
 import asyncpg
 from fastapi import FastAPI
+from dotenv import load_dotenv
 
-DB_URL = os.getenv("DATABASE_URL")
+# Load environment variables from .env file
+load_dotenv()
+
+# Default database URL if not set in environment
+DEFAULT_DATABASE_URL = "postgresql://user:password@localhost:5432/gestion_articles"
+DB_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 
 async def connect():
