@@ -1,0 +1,52 @@
+services:
+  db:
+    container_name: articles_db
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=articles
+      - TZ=Africa/Tunis
+    volumes:
+      # ✅ QNAP Container Station volume
+      - /share/CACHEDEV5_DATA/APPS/container-station-data/lib/docker/volumes/GEST-ART/_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  app:
+    container_name: articles_app
+    image: nikolaik/python-nodejs:python3.12-nodejs18
+    working_dir: /app
+    volumes:
+      - /share/APPS/articles/backend:/app/backend
+      - /share/APPS/articles/frontend:/app/frontend
+      - /share/APPS/articles/data:/app/data
+      - /share/APPS/articles/uploads:/app/backend/uploads
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@db:5432/articles
+      - SECRET_KEY=your-secret-key-change-in-production
+      - VITE_API_URL=http://192.168.100.210:8000
+      - TZ=Africa/Tunis
+    command: >
+      sh -c "
+      echo '🐍 Ensuring bcrypt + passlib compatibility...' &&
+      pip install --no-cache-dir --force-reinstall bcrypt==4.1.2 passlib==1.7.4 &&
+      echo '🚀 Building unified FastAPI + React app...' &&
+      cd /app/frontend &&
+      (npm ci || npm install) &&
+      npm run build &&
+      cd /app/backend &&
+      pip install -r requirements.txt &&
+      echo '✅ Launching FastAPI server...' &&
+      python3 -m uvicorn main:app --host 0.0.0.0 --port 8000
+      "
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

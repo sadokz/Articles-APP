@@ -1,0 +1,19 @@
+NGROK ACTIVATE MANUAL: 
+1- on powershell
+ssh admin@192.168.100.210 
+pass Zgolli22**
+
+2- From QNAP SSH:
+docker exec -it articles_app bash
+
+3- backup db
+docker exec -t articles_db pg_dump -U admin -d articles --data-only > /share/APPS/articles/data/articles_backup_dataonly_$(date +%Y%m%d_%H%M).sql
+
+4- Drop the database safely
+docker exec -i articles_db psql -U admin -d postgres -c "DROP DATABASE IF EXISTS articles;"
+
+5- Recreate it
+docker exec -i articles_db psql -U admin -d postgres -c "CREATE DATABASE articles;"
+
+6- Restore the SQL backup into the new empty database
+docker exec -i articles_db psql -U admin -d articles < /share/APPS/articles/data/NOM DE LA BASE DE DONNE.sql

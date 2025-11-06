@@ -1,0 +1,26 @@
+NGROK ACTIVATE MANUAL: 
+1- on powershell
+ssh admin@192.168.100.210 
+pass Zgolli22**
+
+2- From QNAP SSH:
+docker exec -it articles_app bash
+
+3- from root@e71a56672ac9:/app#
+ # Remove old ngrok & install the new version (v3)
+rm -f /usr/local/bin/ngrok
+wget -O /tmp/ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+tar -xvzf /tmp/ngrok.tgz -C /usr/local/bin
+chmod +x /usr/local/bin/ngrok
+
+4- Add your auth token
+ngrok config add-authtoken 1V1YuybMPty9TjLXpoIoXAJL5Td_5VSFPCymk7jZFWCn6Kn3G
+
+5-Start your tunnel
+ngrok http 8000 --log=stdout
+
+6-Run ngrok in background
+nohup ngrok http 8000 --log=stdout > /app/ngrok.log 2>&1 &
+
+7- check it
+cat /app/ngrok.log | grep "Forwarding"
