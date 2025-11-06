@@ -432,7 +432,7 @@ export const Dashboard: React.FC = () => {
     try {
       setLoading(true);
       if ("id" in articleData && articleData.id) {
-        await updateArticle(articleData);
+        await updateArticle(articleData.id, articleData);
         toast({
           title: "Article modifié",
           description: "L'article a été modifié avec succès",
