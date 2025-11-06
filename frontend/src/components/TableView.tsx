@@ -1,11 +1,17 @@
-
-import React from 'react';
-import { Article } from '../types/Article';
-import { ExtendedUser } from '../types/User';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Edit, Trash2, Calendar, Paperclip } from 'lucide-react';
+import React from "react";
+import { Article } from "../types/Article";
+import { ExtendedUser } from "../types/User";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Edit, Trash2, Calendar, Paperclip } from "lucide-react";
 
 interface TableViewProps {
   articles: Article[];
@@ -22,7 +28,7 @@ export const TableView: React.FC<TableViewProps> = ({
   onEditArticle,
   onDeleteArticle,
   formatPrice,
-  formatDate
+  formatDate,
 }) => {
   const checkRappel = (dateRappel?: string) => {
     if (!dateRappel) return false;
@@ -49,7 +55,14 @@ export const TableView: React.FC<TableViewProps> = ({
         </TableHeader>
         <TableBody>
           {articles.map((article) => (
-            <TableRow key={article.id} className={checkRappel(article.date_rappel) ? 'bg-red-50 dark:bg-red-900/20' : ''}>
+            <TableRow
+              key={article.id}
+              className={
+                checkRappel(article.date_rappel)
+                  ? "bg-red-50 dark:bg-red-900/20"
+                  : ""
+              }
+            >
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">
                   {article.titre}
@@ -58,11 +71,14 @@ export const TableView: React.FC<TableViewProps> = ({
                       <Calendar className="h-4 w-4 text-red-500" />
                     </div>
                   )}
-                  {article.pieces_jointes && article.pieces_jointes.length > 0 && (
-                    <div title={`${article.pieces_jointes.length} pièce(s) jointe(s)`}>
-                      <Paperclip className="h-4 w-4 text-blue-500" />
-                    </div>
-                  )}
+                  {article.pieces_jointes &&
+                    article.pieces_jointes.length > 0 && (
+                      <div
+                        title={`${article.pieces_jointes.length} pièce(s) jointe(s)`}
+                      >
+                        <Paperclip className="h-4 w-4 text-blue-500" />
+                      </div>
+                    )}
                 </div>
               </TableCell>
               <TableCell>
@@ -81,11 +97,16 @@ export const TableView: React.FC<TableViewProps> = ({
               <TableCell>{article.unite}</TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1">
-                  {article.tags && article.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-xs bg-blue-50 text-blue-700">
-                      {tag}
-                    </Badge>
-                  ))}
+                  {article.tags &&
+                    article.tags.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="text-xs bg-blue-50 text-blue-700"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
                 </div>
               </TableCell>
               <TableCell className="text-sm text-gray-600 dark:text-gray-400">

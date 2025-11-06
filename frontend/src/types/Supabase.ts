@@ -1,4 +1,3 @@
-
 export interface Database {
   public: {
     Tables: {
@@ -96,7 +95,7 @@ export interface Database {
           prenom: string | null;
           email: string | null;
           telephone: string | null;
-          niveau_acces: 'lecture_seule' | 'lecture_modification' | 'inactif';
+          niveau_acces: "lecture_seule" | "lecture_modification" | "inactif";
           created_at: string;
           updated_at: string;
         };
@@ -108,7 +107,7 @@ export interface Database {
           prenom?: string | null;
           email?: string | null;
           telephone?: string | null;
-          niveau_acces?: 'lecture_seule' | 'lecture_modification' | 'inactif';
+          niveau_acces?: "lecture_seule" | "lecture_modification" | "inactif";
         };
         Update: {
           username?: string;
@@ -117,7 +116,7 @@ export interface Database {
           prenom?: string | null;
           email?: string | null;
           telephone?: string | null;
-          niveau_acces?: 'lecture_seule' | 'lecture_modification' | 'inactif';
+          niveau_acces?: "lecture_seule" | "lecture_modification" | "inactif";
         };
       };
       modification_history: {
@@ -130,7 +129,7 @@ export interface Database {
           new_value: string | null;
           modified_by: string;
           modified_at: string;
-          action: 'INSERT' | 'UPDATE' | 'DELETE';
+          action: "INSERT" | "UPDATE" | "DELETE";
           created_at: string;
         };
         Insert: {
@@ -141,7 +140,7 @@ export interface Database {
           new_value?: string | null;
           modified_by: string;
           modified_at: string;
-          action: 'INSERT' | 'UPDATE' | 'DELETE';
+          action: "INSERT" | "UPDATE" | "DELETE";
         };
         Update: {
           table_name?: string;
@@ -151,7 +150,7 @@ export interface Database {
           new_value?: string | null;
           modified_by?: string;
           modified_at?: string;
-          action?: 'INSERT' | 'UPDATE' | 'DELETE';
+          action?: "INSERT" | "UPDATE" | "DELETE";
         };
       };
       notification_reminders: {
@@ -201,7 +200,7 @@ export interface ModificationHistoryView {
   new_value: string | null;
   modified_by: string;
   modified_at: string;
-  action: 'INSERT' | 'UPDATE' | 'DELETE';
+  action: "INSERT" | "UPDATE" | "DELETE";
   article_title?: string;
   category_name?: string;
 }

@@ -1,6 +1,6 @@
-import initSqlJs, { Database } from 'sql.js';
-import { User, ExtendedUser } from '../types/User';
-import { Article, Categorie, SousCategorie } from '../types/Article';
+import initSqlJs, { Database } from "sql.js";
+import { User, ExtendedUser } from "../types/User";
+import { Article, Categorie, SousCategorie } from "../types/Article";
 
 class DatabaseServiceClass {
   private db: Database | null = null;
@@ -9,12 +9,12 @@ class DatabaseServiceClass {
   async initialize() {
     if (!this.SQL) {
       this.SQL = await initSqlJs({
-        locateFile: (file: string) => `https://sql.js.org/dist/${file}`
+        locateFile: (file: string) => `https://sql.js.org/dist/${file}`,
       });
     }
 
     // Essayer de charger la base existante depuis localStorage
-    const existingData = localStorage.getItem('articleDB');
+    const existingData = localStorage.getItem("articleDB");
     if (existingData) {
       const binaryData = new Uint8Array(JSON.parse(existingData));
       this.db = new this.SQL.Database(binaryData);
@@ -27,7 +27,7 @@ class DatabaseServiceClass {
   }
 
   private async updateSchema() {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     // Ajouter les nouvelles colonnes à la table users si elles n'existent pas
     try {
@@ -55,7 +55,9 @@ class DatabaseServiceClass {
     }
 
     try {
-      this.db.run(`ALTER TABLE users ADD COLUMN niveau_acces TEXT DEFAULT 'lecture_modification'`);
+      this.db.run(
+        `ALTER TABLE users ADD COLUMN niveau_acces TEXT DEFAULT 'lecture_modification'`,
+      );
     } catch (e) {
       // Colonne existe déjà
     }
@@ -64,7 +66,7 @@ class DatabaseServiceClass {
   }
 
   private async createTables() {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     // Table des utilisateurs
     this.db.run(`
@@ -123,51 +125,85 @@ class DatabaseServiceClass {
     // Utilisateur par défaut
     this.db.run(
       "INSERT INTO users (username, password, nom_complet, nom, prenom, niveau_acces) VALUES (?, ?, ?, ?, ?, ?)",
-      ['admin', 'admin', 'Administrateur', 'Admin', 'Super', 'lecture_modification']
+      [
+        "admin",
+        "admin",
+        "Administrateur",
+        "Admin",
+        "Super",
+        "lecture_modification",
+      ],
     );
 
     // Catégories par défaut
     const categories = [
-      ['Alimentation', 'Produits alimentaires et boissons'],
-      ['Électronique', 'Appareils et accessoires électroniques'],
-      ['Vêtements', 'Articles vestimentaires et accessoires'],
+      ["Alimentation", "Produits alimentaires et boissons"],
+      ["Électronique", "Appareils et accessoires électroniques"],
+      ["Vêtements", "Articles vestimentaires et accessoires"],
     ];
 
     categories.forEach(([nom, description]) => {
-      this.db!.run(
-        "INSERT INTO categories (nom, description) VALUES (?, ?)",
-        [nom, description]
-      );
+      this.db!.run("INSERT INTO categories (nom, description) VALUES (?, ?)", [
+        nom,
+        description,
+      ]);
     });
 
     // Sous-catégories par défaut
     const sousCategories = [
-      ['Fruits', 'Fruits frais et secs', 'Alimentation'],
-      ['Légumes', 'Légumes frais et conservés', 'Alimentation'],
-      ['Smartphones', 'Téléphones portables et accessoires', 'Électronique'],
-      ['Ordinateurs', 'PC, laptops et accessoires', 'Électronique'],
-      ['T-shirts', 'T-shirts et polos', 'Vêtements'],
-      ['Pantalons', 'Pantalons et jeans', 'Vêtements'],
+      ["Fruits", "Fruits frais et secs", "Alimentation"],
+      ["Légumes", "Légumes frais et conservés", "Alimentation"],
+      ["Smartphones", "Téléphones portables et accessoires", "Électronique"],
+      ["Ordinateurs", "PC, laptops et accessoires", "Électronique"],
+      ["T-shirts", "T-shirts et polos", "Vêtements"],
+      ["Pantalons", "Pantalons et jeans", "Vêtements"],
     ];
 
     sousCategories.forEach(([nom, description, categorie]) => {
       this.db!.run(
         "INSERT INTO sous_categories (nom, description, categorie) VALUES (?, ?, ?)",
-        [nom, description, categorie]
+        [nom, description, categorie],
       );
     });
 
     // Articles par défaut
     const articles = [
-      ['Pommes Gala', 2.50, 'kg', 'Pommes Gala fraîches du verger', 'Alimentation', 'Fruits', 'admin', new Date().toISOString()],
-      ['iPhone 15', 999.99, 'unité', 'Smartphone Apple iPhone 15', 'Électronique', 'Smartphones', 'admin', new Date().toISOString()],
-      ['T-shirt Blanc', 19.99, 'unité', 'T-shirt blanc 100% coton', 'Vêtements', 'T-shirts', 'admin', new Date().toISOString()],
+      [
+        "Pommes Gala",
+        2.5,
+        "kg",
+        "Pommes Gala fraîches du verger",
+        "Alimentation",
+        "Fruits",
+        "admin",
+        new Date().toISOString(),
+      ],
+      [
+        "iPhone 15",
+        999.99,
+        "unité",
+        "Smartphone Apple iPhone 15",
+        "Électronique",
+        "Smartphones",
+        "admin",
+        new Date().toISOString(),
+      ],
+      [
+        "T-shirt Blanc",
+        19.99,
+        "unité",
+        "T-shirt blanc 100% coton",
+        "Vêtements",
+        "T-shirts",
+        "admin",
+        new Date().toISOString(),
+      ],
     ];
 
     articles.forEach((article, index) => {
       this.db!.run(
         "INSERT INTO articles (titre, prix, unite, description, categorie, sous_categorie, dernier_modifie_par, date_modification, ordre) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [...article, index]
+        [...article, index],
       );
     });
 
@@ -177,20 +213,25 @@ class DatabaseServiceClass {
   saveToLocalStorage() {
     if (!this.db) return;
     const data = this.db.export();
-    localStorage.setItem('articleDB', JSON.stringify(Array.from(data)));
+    localStorage.setItem("articleDB", JSON.stringify(Array.from(data)));
   }
 
   // Méthodes d'authentification
-  async authenticateUser(username: string, password: string): Promise<ExtendedUser | null> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+  async authenticateUser(
+    username: string,
+    password: string,
+  ): Promise<ExtendedUser | null> {
+    if (!this.db) throw new Error("Base de données non initialisée");
 
-    const stmt = this.db.prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+    const stmt = this.db.prepare(
+      "SELECT * FROM users WHERE username = ? AND password = ?",
+    );
     const result = stmt.getAsObject([username, password]);
     stmt.free();
 
     if (result.id) {
       // Vérifier si le compte est inactif
-      if (result.niveau_acces === 'inactif') {
+      if (result.niveau_acces === "inactif") {
         return null;
       }
 
@@ -202,7 +243,10 @@ class DatabaseServiceClass {
         prenom: result.prenom as string,
         email: result.email as string,
         telephone: result.telephone as string,
-        niveau_acces: result.niveau_acces as 'lecture_seule' | 'lecture_modification' | 'inactif'
+        niveau_acces: result.niveau_acces as
+          | "lecture_seule"
+          | "lecture_modification"
+          | "inactif",
       };
     }
     return null;
@@ -210,7 +254,7 @@ class DatabaseServiceClass {
 
   // Méthodes pour les utilisateurs
   async getUsers(): Promise<ExtendedUser[]> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     const stmt = this.db.prepare("SELECT * FROM users ORDER BY username");
     const users: ExtendedUser[] = [];
@@ -225,34 +269,37 @@ class DatabaseServiceClass {
         prenom: row.prenom as string,
         email: row.email as string,
         telephone: row.telephone as string,
-        niveau_acces: row.niveau_acces as 'lecture_seule' | 'lecture_modification' | 'inactif'
+        niveau_acces: row.niveau_acces as
+          | "lecture_seule"
+          | "lecture_modification"
+          | "inactif",
       });
     }
     stmt.free();
     return users;
   }
 
-  async addUser(user: Omit<ExtendedUser, 'id'>): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+  async addUser(user: Omit<ExtendedUser, "id">): Promise<void> {
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run(
       "INSERT INTO users (username, password, nom_complet, nom, prenom, email, telephone, niveau_acces) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         user.username,
-        user.password || 'password123',
+        user.password || "password123",
         user.nom_complet,
-        user.nom || '',
-        user.prenom || '',
-        user.email || '',
-        user.telephone || '',
-        user.niveau_acces || 'lecture_modification'
-      ]
+        user.nom || "",
+        user.prenom || "",
+        user.email || "",
+        user.telephone || "",
+        user.niveau_acces || "lecture_modification",
+      ],
     );
     this.saveToLocalStorage();
   }
 
   async updateUser(user: ExtendedUser): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     const updateFields = [
       "nom_complet = ?",
@@ -260,26 +307,26 @@ class DatabaseServiceClass {
       "prenom = ?",
       "email = ?",
       "telephone = ?",
-      "niveau_acces = ?"
+      "niveau_acces = ?",
     ];
 
     const values = [
       user.nom_complet,
-      user.nom || '',
-      user.prenom || '',
-      user.email || '',
-      user.telephone || '',
-      user.niveau_acces || 'lecture_modification'
+      user.nom || "",
+      user.prenom || "",
+      user.email || "",
+      user.telephone || "",
+      user.niveau_acces || "lecture_modification",
     ];
 
     // Si un nouveau mot de passe est fourni, l'inclure
-    if (user.password && user.password.trim() !== '') {
+    if (user.password && user.password.trim() !== "") {
       updateFields.push("password = ?");
       values.push(user.password);
     }
 
     // Ne pas permettre de modifier l'identifiant admin
-    if (user.username !== 'admin') {
+    if (user.username !== "admin") {
       updateFields.push("username = ?");
       values.push(user.username);
     }
@@ -287,70 +334,78 @@ class DatabaseServiceClass {
     values.push(user.id.toString());
 
     this.db.run(
-      `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`,
-      values
+      `UPDATE users SET ${updateFields.join(", ")} WHERE id = ?`,
+      values,
     );
     this.saveToLocalStorage();
   }
 
   async deleteUser(id: number): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run("DELETE FROM users WHERE id = ?", [id.toString()]);
     this.saveToLocalStorage();
   }
 
   // Nouvelles méthodes pour les catégories
-  async addCategory(category: Omit<Categorie, 'id'>): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+  async addCategory(category: Omit<Categorie, "id">): Promise<void> {
+    if (!this.db) throw new Error("Base de données non initialisée");
 
-    this.db.run(
-      "INSERT INTO categories (nom, description) VALUES (?, ?)",
-      [category.nom, category.description]
-    );
+    this.db.run("INSERT INTO categories (nom, description) VALUES (?, ?)", [
+      category.nom,
+      category.description,
+    ]);
     this.saveToLocalStorage();
   }
 
   async updateCategory(category: Categorie): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
-    this.db.run(
-      "UPDATE categories SET nom = ?, description = ? WHERE id = ?",
-      [category.nom, category.description, category.id]
-    );
+    this.db.run("UPDATE categories SET nom = ?, description = ? WHERE id = ?", [
+      category.nom,
+      category.description,
+      category.id,
+    ]);
     this.saveToLocalStorage();
   }
 
   async deleteCategory(id: number): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run("DELETE FROM categories WHERE id = ?", [id]);
     this.saveToLocalStorage();
   }
 
   // Nouvelles méthodes pour les sous-catégories
-  async addSousCategory(sousCategory: Omit<SousCategorie, 'id'>): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+  async addSousCategory(
+    sousCategory: Omit<SousCategorie, "id">,
+  ): Promise<void> {
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run(
       "INSERT INTO sous_categories (nom, description, categorie) VALUES (?, ?, ?)",
-      [sousCategory.nom, sousCategory.description, sousCategory.categorie]
+      [sousCategory.nom, sousCategory.description, sousCategory.categorie],
     );
     this.saveToLocalStorage();
   }
 
   async updateSousCategory(sousCategory: SousCategorie): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run(
       "UPDATE sous_categories SET nom = ?, description = ?, categorie = ? WHERE id = ?",
-      [sousCategory.nom, sousCategory.description, sousCategory.categorie, sousCategory.id]
+      [
+        sousCategory.nom,
+        sousCategory.description,
+        sousCategory.categorie,
+        sousCategory.id,
+      ],
     );
     this.saveToLocalStorage();
   }
 
   async deleteSousCategory(id: number): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run("DELETE FROM sous_categories WHERE id = ?", [id]);
     this.saveToLocalStorage();
@@ -358,9 +413,11 @@ class DatabaseServiceClass {
 
   // Méthodes pour les articles
   async getArticles(): Promise<Article[]> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
-    const stmt = this.db.prepare("SELECT * FROM articles ORDER BY ordre ASC, id DESC");
+    const stmt = this.db.prepare(
+      "SELECT * FROM articles ORDER BY ordre ASC, id DESC",
+    );
     const articles: Article[] = [];
 
     while (stmt.step()) {
@@ -375,15 +432,15 @@ class DatabaseServiceClass {
         sous_categorie: row.sous_categorie as string,
         dernier_modifie_par: row.dernier_modifie_par as string,
         date_modification: row.date_modification as string,
-        ordre: row.ordre as number
+        ordre: row.ordre as number,
       });
     }
     stmt.free();
     return articles;
   }
 
-  async addArticle(article: Omit<Article, 'id'>): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+  async addArticle(article: Omit<Article, "id">): Promise<void> {
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run(
       "INSERT INTO articles (titre, prix, unite, description, categorie, sous_categorie, dernier_modifie_par, date_modification, ordre) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -396,14 +453,14 @@ class DatabaseServiceClass {
         article.sous_categorie,
         article.dernier_modifie_par,
         article.date_modification,
-        article.ordre || 0
-      ]
+        article.ordre || 0,
+      ],
     );
     this.saveToLocalStorage();
   }
 
   async updateArticle(article: Article): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run(
       "UPDATE articles SET titre = ?, prix = ?, unite = ?, description = ?, categorie = ?, sous_categorie = ?, dernier_modifie_par = ?, date_modification = ?, ordre = ? WHERE id = ?",
@@ -417,14 +474,14 @@ class DatabaseServiceClass {
         article.dernier_modifie_par,
         article.date_modification,
         article.ordre || 0,
-        article.id
-      ]
+        article.id,
+      ],
     );
     this.saveToLocalStorage();
   }
 
   async deleteArticle(id: number): Promise<void> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     this.db.run("DELETE FROM articles WHERE id = ?", [id]);
     this.saveToLocalStorage();
@@ -432,7 +489,7 @@ class DatabaseServiceClass {
 
   // Méthodes pour les catégories
   async getCategories(): Promise<Categorie[]> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     const stmt = this.db.prepare("SELECT * FROM categories ORDER BY nom");
     const categories: Categorie[] = [];
@@ -442,7 +499,7 @@ class DatabaseServiceClass {
       categories.push({
         id: row.id as number,
         nom: row.nom as string,
-        description: row.description as string
+        description: row.description as string,
       });
     }
     stmt.free();
@@ -450,7 +507,7 @@ class DatabaseServiceClass {
   }
 
   async getSousCategories(categorie?: string): Promise<SousCategorie[]> {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
 
     const query = categorie
       ? "SELECT * FROM sous_categories WHERE categorie = ? ORDER BY nom"
@@ -467,7 +524,7 @@ class DatabaseServiceClass {
           id: row.id as number,
           nom: row.nom as string,
           description: row.description as string,
-          categorie: row.categorie as string
+          categorie: row.categorie as string,
         });
       }
     } else {
@@ -477,7 +534,7 @@ class DatabaseServiceClass {
           id: row.id as number,
           nom: row.nom as string,
           description: row.description as string,
-          categorie: row.categorie as string
+          categorie: row.categorie as string,
         });
       }
     }
@@ -487,12 +544,12 @@ class DatabaseServiceClass {
 
   // Export/Import de la base
   exportDatabase(): Uint8Array {
-    if (!this.db) throw new Error('Base de données non initialisée');
+    if (!this.db) throw new Error("Base de données non initialisée");
     return this.db.export();
   }
 
   async importDatabase(data: Uint8Array): Promise<void> {
-    if (!this.SQL) throw new Error('SQL.js non initialisé');
+    if (!this.SQL) throw new Error("SQL.js non initialisé");
     this.db = new this.SQL.Database(data);
     await this.updateSchema();
     this.saveToLocalStorage();

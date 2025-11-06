@@ -1,24 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { ArticleModal } from './ArticleModal';
-import { CategoryManagement } from './CategoryManagement';
-import { CategoryDescription } from './CategoryDescription';
-import { UserManagement } from './UserManagement';
-import { TableView } from './TableView';
-import { AdvancedSearch } from './AdvancedSearch';
-import { StatisticsDashboard } from './StatisticsDashboard';
-import { ExportModal } from './ExportModal';
-import { Article, Categorie, SousCategorie, Statistiques, RechercheAvancee } from '../types/Article';
-import { User } from '../types/User';
-import { useAuth } from '../contexts/AuthContext';
-import { getArticles, getCategories, getSousCategories, createArticle, updateArticle, deleteArticle } from '../api';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { ArticleModal } from "./ArticleModal";
+import { CategoryManagement } from "./CategoryManagement";
+import { CategoryDescription } from "./CategoryDescription";
+import { UserManagement } from "./UserManagement";
+import { TableView } from "./TableView";
+import { AdvancedSearch } from "./AdvancedSearch";
+import { StatisticsDashboard } from "./StatisticsDashboard";
+import { ExportModal } from "./ExportModal";
+import {
+  Article,
+  Categorie,
+  SousCategorie,
+  Statistiques,
+  RechercheAvancee,
+} from "../types/Article";
+import { User } from "../types/User";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  getArticles,
+  getCategories,
+  getSousCategories,
+  createArticle,
+  updateArticle,
+  deleteArticle,
+} from "../api";
+import { useToast } from "@/hooks/use-toast";
 import {
   Plus,
   Search,
@@ -39,10 +64,17 @@ import {
   FileText,
   Calendar,
   Shield,
-  Package
-} from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+  Package,
+} from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Dashboard: React.FC = () => {
   const { user, logout, hasPermission, hasRole, token } = useAuth();
@@ -54,21 +86,23 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   // Filtres et recherche
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategorie, setFilterCategorie] = useState<string>('all');
-  const [filterSousCategorie, setFilterSousCategorie] = useState<string>('all');
-  const [rechercheAvancee, setRechercheAvancee] = useState<RechercheAvancee | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategorie, setFilterCategorie] = useState<string>("all");
+  const [filterSousCategorie, setFilterSousCategorie] = useState<string>("all");
+  const [rechercheAvancee, setRechercheAvancee] =
+    useState<RechercheAvancee | null>(null);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   // Mode d'affichage
-  const [viewMode, setViewMode] = useState<'card' | 'table'>(() => {
-    return (localStorage.getItem('viewMode') as 'card' | 'table') || 'card';
+  const [viewMode, setViewMode] = useState<"card" | "table">(() => {
+    return (localStorage.getItem("viewMode") as "card" | "table") || "card";
   });
 
   // Modales
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
-  const [isCategoryManagementOpen, setIsCategoryManagementOpen] = useState(false);
+  const [isCategoryManagementOpen, setIsCategoryManagementOpen] =
+    useState(false);
   const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
@@ -81,17 +115,20 @@ export const Dashboard: React.FC = () => {
     totalCategories: 0,
     totalSousCategories: 0,
     articlesModifiesCeMois: 0,
-    utilisateurLePlusActif: ''
+    utilisateurLePlusActif: "",
   });
 
   const { toast } = useToast();
 
   // Determine permissions based on role
-  const canViewArticles = hasPermission('articles.read') || hasRole('viewer');
-  const canModifyArticles = hasPermission('articles.update') || hasPermission('articles.create');
-  const canDeleteArticles = hasPermission('articles.delete');
-  const canManageCategories = hasPermission('categories.create') || hasPermission('categories.update');
-  const canManageUsers = hasPermission('users.read') || hasRole('admin') || hasRole('super_admin');
+  const canViewArticles = hasPermission("articles.read") || hasRole("viewer");
+  const canModifyArticles =
+    hasPermission("articles.update") || hasPermission("articles.create");
+  const canDeleteArticles = hasPermission("articles.delete");
+  const canManageCategories =
+    hasPermission("categories.create") || hasPermission("categories.update");
+  const canManageUsers =
+    hasPermission("users.read") || hasRole("admin") || hasRole("super_admin");
 
   useEffect(() => {
     if (canViewArticles) {
@@ -101,18 +138,24 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, [isDarkMode]);
 
   useEffect(() => {
     filterArticles();
-  }, [articles, searchTerm, filterCategorie, filterSousCategorie, rechercheAvancee]);
+  }, [
+    articles,
+    searchTerm,
+    filterCategorie,
+    filterSousCategorie,
+    rechercheAvancee,
+  ]);
 
   useEffect(() => {
-    localStorage.setItem('viewMode', viewMode);
+    localStorage.setItem("viewMode", viewMode);
   }, [viewMode]);
 
   useEffect(() => {
@@ -122,26 +165,28 @@ export const Dashboard: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [articlesData, categoriesData, sousCategoriesData] = await Promise.all([
-        getArticles(token || undefined),
-        getCategories(token || undefined),
-        getSousCategories(token || undefined)
-      ]);
+      const [articlesData, categoriesData, sousCategoriesData] =
+        await Promise.all([
+          getArticles(token || undefined),
+          getCategories(token || undefined),
+          getSousCategories(token || undefined),
+        ]);
 
       setArticles(articlesData);
       setCategories(categoriesData);
       setSousCategories(sousCategoriesData);
 
-      console.log('Loaded data from API:', {
+      console.log("Loaded data from API:", {
         articles: articlesData.length,
         categories: categoriesData.length,
-        sousCategories: sousCategoriesData.length
+        sousCategories: sousCategoriesData.length,
       });
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
+      console.error("Erreur lors du chargement des données:", error);
       toast({
         title: "Erreur de connexion",
-        description: "Impossible de charger les données depuis le serveur. Vérifiez que le backend FastAPI est démarré sur http://localhost:8000",
+        description:
+          "Impossible de charger les données depuis le serveur. Vérifiez que le backend FastAPI est démarré sur http://localhost:8000",
         variant: "destructive",
       });
     } finally {
@@ -151,28 +196,37 @@ export const Dashboard: React.FC = () => {
 
   const calculateStatistics = () => {
     const maintenant = new Date();
-    const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1);
+    const debutMois = new Date(
+      maintenant.getFullYear(),
+      maintenant.getMonth(),
+      1,
+    );
 
-    const articlesModifiesCeMois = articles.filter(article =>
-      article.date_modification && new Date(article.date_modification) >= debutMois
+    const articlesModifiesCeMois = articles.filter(
+      (article) =>
+        article.date_modification &&
+        new Date(article.date_modification) >= debutMois,
     ).length;
 
     // Compter les modifications par utilisateur
-    const modifications = articles.reduce((acc, article) => {
-      const user = article.dernier_modifie_par || 'Inconnu';
-      acc[user] = (acc[user] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const modifications = articles.reduce(
+      (acc, article) => {
+        const user = article.dernier_modifie_par || "Inconnu";
+        acc[user] = (acc[user] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const utilisateurLePlusActif = Object.entries(modifications)
-      .sort(([, a], [, b]) => b - a)[0]?.[0] || '';
+    const utilisateurLePlusActif =
+      Object.entries(modifications).sort(([, a], [, b]) => b - a)[0]?.[0] || "";
 
     setStatistics({
       totalArticles: articles.length,
       totalCategories: categories.length,
       totalSousCategories: sousCategories.length,
       articlesModifiesCeMois,
-      utilisateurLePlusActif
+      utilisateurLePlusActif,
     });
   };
 
@@ -181,59 +235,83 @@ export const Dashboard: React.FC = () => {
 
     // Recherche simple
     if (searchTerm) {
-      filtered = filtered.filter(article =>
-        article.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (article.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (article) =>
+          article.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (article.description || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()),
       );
     }
 
     // Filtres catégories
-    if (filterCategorie !== 'all') {
-      filtered = filtered.filter(article => article.categorie === filterCategorie);
+    if (filterCategorie !== "all") {
+      filtered = filtered.filter(
+        (article) => article.categorie === filterCategorie,
+      );
     }
 
-    if (filterSousCategorie !== 'all') {
-      filtered = filtered.filter(article => article.sous_categorie === filterSousCategorie);
+    if (filterSousCategorie !== "all") {
+      filtered = filtered.filter(
+        (article) => article.sous_categorie === filterSousCategorie,
+      );
     }
 
     // Recherche avancée
     if (rechercheAvancee) {
       if (rechercheAvancee.motCle) {
-        filtered = filtered.filter(article =>
-          article.titre.toLowerCase().includes(rechercheAvancee.motCle.toLowerCase()) ||
-          (article.description || '').toLowerCase().includes(rechercheAvancee.motCle.toLowerCase())
+        filtered = filtered.filter(
+          (article) =>
+            article.titre
+              .toLowerCase()
+              .includes(rechercheAvancee.motCle.toLowerCase()) ||
+            (article.description || "")
+              .toLowerCase()
+              .includes(rechercheAvancee.motCle.toLowerCase()),
         );
       }
 
       if (rechercheAvancee.prixMin !== null) {
-        filtered = filtered.filter(article => article.prix >= rechercheAvancee.prixMin!);
+        filtered = filtered.filter(
+          (article) => article.prix >= rechercheAvancee.prixMin!,
+        );
       }
 
       if (rechercheAvancee.prixMax !== null) {
-        filtered = filtered.filter(article => article.prix <= rechercheAvancee.prixMax!);
+        filtered = filtered.filter(
+          (article) => article.prix <= rechercheAvancee.prixMax!,
+        );
       }
 
       if (rechercheAvancee.utilisateur) {
-        filtered = filtered.filter(article =>
-          (article.dernier_modifie_par || '') === rechercheAvancee.utilisateur
+        filtered = filtered.filter(
+          (article) =>
+            (article.dernier_modifie_par || "") ===
+            rechercheAvancee.utilisateur,
         );
       }
 
       if (rechercheAvancee.dateDebut) {
-        filtered = filtered.filter(article =>
-          article.date_modification && new Date(article.date_modification) >= new Date(rechercheAvancee.dateDebut)
+        filtered = filtered.filter(
+          (article) =>
+            article.date_modification &&
+            new Date(article.date_modification) >=
+              new Date(rechercheAvancee.dateDebut),
         );
       }
 
       if (rechercheAvancee.dateFin) {
-        filtered = filtered.filter(article =>
-          article.date_modification && new Date(article.date_modification) <= new Date(rechercheAvancee.dateFin)
+        filtered = filtered.filter(
+          (article) =>
+            article.date_modification &&
+            new Date(article.date_modification) <=
+              new Date(rechercheAvancee.dateFin),
         );
       }
 
       if (rechercheAvancee.tags.length > 0) {
-        filtered = filtered.filter(article =>
-          article.tags?.some(tag => rechercheAvancee.tags.includes(tag))
+        filtered = filtered.filter((article) =>
+          article.tags?.some((tag) => rechercheAvancee.tags.includes(tag)),
         );
       }
     }
@@ -243,30 +321,34 @@ export const Dashboard: React.FC = () => {
 
   const handleAdvancedSearch = (criteria: RechercheAvancee) => {
     setRechercheAvancee(criteria);
-    setSearchTerm('');
-    setFilterCategorie('all');
-    setFilterSousCategorie('all');
+    setSearchTerm("");
+    setFilterCategorie("all");
+    setFilterSousCategorie("all");
   };
 
   const handleResetSearch = () => {
     setRechercheAvancee(null);
-    setSearchTerm('');
-    setFilterCategorie('all');
-    setFilterSousCategorie('all');
+    setSearchTerm("");
+    setFilterCategorie("all");
+    setFilterSousCategorie("all");
   };
 
   const getUtilisateursUniques = () => {
-    return [...new Set(articles.map(article => article.dernier_modifie_par || 'Inconnu'))];
+    return [
+      ...new Set(
+        articles.map((article) => article.dernier_modifie_par || "Inconnu"),
+      ),
+    ];
   };
 
   const getTagsUniques = () => {
-    const allTags = articles.flatMap(article => article.tags || []);
+    const allTags = articles.flatMap((article) => article.tags || []);
     return [...new Set(allTags)];
   };
 
   const checkRappels = () => {
     const maintenant = new Date();
-    const rappelsActifs = articles.filter(article => {
+    const rappelsActifs = articles.filter((article) => {
       if (!article.date_rappel) return false;
       return new Date(article.date_rappel) <= maintenant;
     });
@@ -288,7 +370,8 @@ export const Dashboard: React.FC = () => {
     if (!canModifyArticles) {
       toast({
         title: "Accès refusé",
-        description: "Vous n'avez pas les permissions pour ajouter des articles",
+        description:
+          "Vous n'avez pas les permissions pour ajouter des articles",
         variant: "destructive",
       });
       return;
@@ -301,7 +384,8 @@ export const Dashboard: React.FC = () => {
     if (!canModifyArticles) {
       toast({
         title: "Accès refusé",
-        description: "Vous n'avez pas les permissions pour modifier des articles",
+        description:
+          "Vous n'avez pas les permissions pour modifier des articles",
         variant: "destructive",
       });
       return;
@@ -314,13 +398,14 @@ export const Dashboard: React.FC = () => {
     if (!canDeleteArticles) {
       toast({
         title: "Accès refusé",
-        description: "Vous n'avez pas les permissions pour supprimer des articles",
+        description:
+          "Vous n'avez pas les permissions pour supprimer des articles",
         variant: "destructive",
       });
       return;
     }
 
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
       try {
         setLoading(true);
         await deleteArticle(id);
@@ -341,10 +426,12 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const handleSaveArticle = async (articleData: Omit<Article, 'id'> | Article) => {
+  const handleSaveArticle = async (
+    articleData: Omit<Article, "id"> | Article,
+  ) => {
     try {
       setLoading(true);
-      if ('id' in articleData && articleData.id) {
+      if ("id" in articleData && articleData.id) {
         await updateArticle(articleData);
         toast({
           title: "Article modifié",
@@ -373,7 +460,8 @@ export const Dashboard: React.FC = () => {
   const handleExportDatabase = () => {
     toast({
       title: "Fonctionnalité non disponible",
-      description: "L'export de base de données n'est pas encore implémenté avec l'API backend",
+      description:
+        "L'export de base de données n'est pas encore implémenté avec l'API backend",
       variant: "destructive",
     });
   };
@@ -381,26 +469,27 @@ export const Dashboard: React.FC = () => {
   const handleImportDatabase = (event: React.ChangeEvent<HTMLInputElement>) => {
     toast({
       title: "Fonctionnalité non disponible",
-      description: "L'import de base de données n'est pas encore implémenté avec l'API backend",
+      description:
+        "L'import de base de données n'est pas encore implémenté avec l'API backend",
       variant: "destructive",
     });
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR'
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
     }).format(price);
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'Non défini';
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    if (!dateString) return "Non défini";
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -410,7 +499,8 @@ export const Dashboard: React.FC = () => {
     } else {
       toast({
         title: "Accès refusé",
-        description: "Vous n'avez pas les permissions nécessaires pour gérer les utilisateurs",
+        description:
+          "Vous n'avez pas les permissions nécessaires pour gérer les utilisateurs",
         variant: "destructive",
       });
     }
@@ -422,8 +512,12 @@ export const Dashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Connexion au serveur...</p>
-          <p className="mt-2 text-sm text-gray-500">Assurez-vous que FastAPI fonctionne sur http://localhost:8000</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Connexion au serveur...
+          </p>
+          <p className="mt-2 text-sm text-gray-500">
+            Assurez-vous que FastAPI fonctionne sur http://localhost:8000
+          </p>
         </div>
       </div>
     );
@@ -438,12 +532,18 @@ export const Dashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="w-96">
           <CardHeader>
-            <CardTitle className="text-center text-red-600">Accès Refusé</CardTitle>
+            <CardTitle className="text-center text-red-600">
+              Accès Refusé
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="mb-4">Vous n'avez pas les permissions nécessaires pour accéder à cette section.</p>
+            <p className="mb-4">
+              Vous n'avez pas les permissions nécessaires pour accéder à cette
+              section.
+            </p>
             <p className="text-sm text-gray-600 mb-4">
-              Rôle actuel: <Badge variant="outline">{user.role_display_name}</Badge>
+              Rôle actuel:{" "}
+              <Badge variant="outline">{user.role_display_name}</Badge>
             </p>
             <Button onClick={logout} variant="outline">
               Se déconnecter
@@ -461,7 +561,9 @@ export const Dashboard: React.FC = () => {
         <div className="fixed top-4 right-4 z-50">
           <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg flex items-center">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-500 mr-2"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Traitement en cours...</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Traitement en cours...
+            </span>
           </div>
         </div>
       )}
@@ -490,15 +592,28 @@ export const Dashboard: React.FC = () => {
                 onClick={() => setIsDarkMode(!isDarkMode)}
                 className="text-gray-600 dark:text-gray-400"
               >
-                {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {isDarkMode ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
               </Button>
 
               <div className="flex flex-col items-end">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {user.nom_complet}
                 </span>
-                <Badge variant={user.niveau_acces === 'lecture_seule' ? 'secondary' : 'default'} className="text-xs">
-                  {user.niveau_acces === 'lecture_seule' ? 'Lecture seule' : 'Lecture + Modification'}
+                <Badge
+                  variant={
+                    user.niveau_acces === "lecture_seule"
+                      ? "secondary"
+                      : "default"
+                  }
+                  className="text-xs"
+                >
+                  {user.niveau_acces === "lecture_seule"
+                    ? "Lecture seule"
+                    : "Lecture + Modification"}
                 </Badge>
               </div>
 
@@ -545,7 +660,11 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex gap-2">
-            <Select value={filterCategorie} onValueChange={setFilterCategorie} disabled={!!rechercheAvancee}>
+            <Select
+              value={filterCategorie}
+              onValueChange={setFilterCategorie}
+              disabled={!!rechercheAvancee}
+            >
               <SelectTrigger className="w-48">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Catégorie" />
@@ -553,7 +672,7 @@ export const Dashboard: React.FC = () => {
               <SelectContent>
                 <SelectItem value="all">Toutes les catégories</SelectItem>
                 {categories
-                  .filter(cat => cat.nom && cat.nom.trim() !== '')
+                  .filter((cat) => cat.nom && cat.nom.trim() !== "")
                   .map((cat) => (
                     <SelectItem key={cat.id} value={cat.nom}>
                       {cat.nom}
@@ -562,14 +681,24 @@ export const Dashboard: React.FC = () => {
               </SelectContent>
             </Select>
 
-            <Select value={filterSousCategorie} onValueChange={setFilterSousCategorie} disabled={!!rechercheAvancee}>
+            <Select
+              value={filterSousCategorie}
+              onValueChange={setFilterSousCategorie}
+              disabled={!!rechercheAvancee}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Sous-catégorie" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les sous-catégories</SelectItem>
                 {sousCategories
-                  .filter(sc => sc.nom && sc.nom.trim() !== '' && (filterCategorie === 'all' || sc.categorie === filterCategorie))
+                  .filter(
+                    (sc) =>
+                      sc.nom &&
+                      sc.nom.trim() !== "" &&
+                      (filterCategorie === "all" ||
+                        sc.categorie === filterCategorie),
+                  )
                   .map((sc) => (
                     <SelectItem key={sc.id} value={sc.nom}>
                       {sc.nom}
@@ -583,7 +712,10 @@ export const Dashboard: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-2 mb-6">
           {canModifyArticles && (
-            <Button onClick={handleAddArticle} className="bg-orange-500 hover:bg-orange-600">
+            <Button
+              onClick={handleAddArticle}
+              className="bg-orange-500 hover:bg-orange-600"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Nouvel Article
             </Button>
@@ -598,19 +730,21 @@ export const Dashboard: React.FC = () => {
           </Button>
 
           <div className="flex items-center space-x-2 ml-4">
-            <Label htmlFor="view-mode" className="text-sm">Mode:</Label>
+            <Label htmlFor="view-mode" className="text-sm">
+              Mode:
+            </Label>
             <div className="flex items-center space-x-2">
               <Button
-                variant={viewMode === 'card' ? 'default' : 'outline'}
+                variant={viewMode === "card" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setViewMode('card')}
+                onClick={() => setViewMode("card")}
               >
                 <Grid3X3 className="h-4 w-4" />
               </Button>
               <Button
-                variant={viewMode === 'table' ? 'default' : 'outline'}
+                variant={viewMode === "table" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setViewMode('table')}
+                onClick={() => setViewMode("table")}
               >
                 <List className="h-4 w-4" />
               </Button>
@@ -652,7 +786,10 @@ export const Dashboard: React.FC = () => {
           </Button>
 
           {canModifyArticles && (
-            <Button variant="outline" onClick={() => document.getElementById('import-file')?.click()}>
+            <Button
+              variant="outline"
+              onClick={() => document.getElementById("import-file")?.click()}
+            >
               <Upload className="h-4 w-4 mr-2" />
               Importer DB
             </Button>
@@ -673,13 +810,18 @@ export const Dashboard: React.FC = () => {
         />
 
         {/* Articles List */}
-        {viewMode === 'card' ? (
+        {viewMode === "card" ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredArticles.map((article) => {
-              const isRappelActif = article.date_rappel && new Date(article.date_rappel) <= new Date();
+              const isRappelActif =
+                article.date_rappel &&
+                new Date(article.date_rappel) <= new Date();
 
               return (
-                <Card key={article.id} className={`hover:shadow-lg transition-shadow duration-200 ${isRappelActif ? 'ring-2 ring-red-500' : ''}`}>
+                <Card
+                  key={article.id}
+                  className={`hover:shadow-lg transition-shadow duration-200 ${isRappelActif ? "ring-2 ring-red-500" : ""}`}
+                >
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -725,7 +867,7 @@ export const Dashboard: React.FC = () => {
                   <CardContent>
                     <div className="space-y-2">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {article.description || 'Aucune description'}
+                        {article.description || "Aucune description"}
                       </p>
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-bold text-orange-600">
@@ -738,14 +880,19 @@ export const Dashboard: React.FC = () => {
                       {article.tags && article.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {article.tags.map((tag, index) => (
-                            <Badge key={index} variant="outline" className="text-xs bg-blue-50 text-blue-700">
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="text-xs bg-blue-50 text-blue-700"
+                            >
                               {tag}
                             </Badge>
                           ))}
                         </div>
                       )}
                       <div className="text-xs text-gray-500 pt-2 border-t border-gray-200 dark:border-gray-700">
-                        Modifié par {article.dernier_modifie_par || 'Inconnu'}<br />
+                        Modifié par {article.dernier_modifie_par || "Inconnu"}
+                        <br />
                         le {formatDate(article.date_modification)}
                       </div>
                     </div>
@@ -774,8 +921,7 @@ export const Dashboard: React.FC = () => {
               <p className="text-sm text-gray-400 mt-2">
                 {canModifyArticles
                   ? "Commencez par ajouter votre premier article."
-                  : "Aucun article disponible pour le moment."
-                }
+                  : "Aucun article disponible pour le moment."}
               </p>
             </CardContent>
           </Card>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dashboard } from '../components/Dashboard';
-import { useAuth } from '../contexts/AuthContext';
-import { LogIn, UserPlus } from 'lucide-react';
-import { LoginModal } from '../components/LoginModal';
-import { RegisterModal } from '../components/RegisterModal';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dashboard } from "../components/Dashboard";
+import { useAuth } from "../contexts/AuthContext";
+import { LogIn, UserPlus } from "lucide-react";
+import { LoginModal } from "../components/LoginModal";
+import { RegisterModal } from "../components/RegisterModal";
 
 const Index = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -47,7 +47,10 @@ const Index = () => {
       </header>
 
       {/* Contenu principal de la page d'accueil */}
-      <main className="flex items-center justify-center px-4" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <main
+        className="flex items-center justify-center px-4"
+        style={{ minHeight: "calc(100vh - 80px)" }}
+      >
         <div className="text-center max-w-4xl mx-auto">
           {/* Logo */}
           <div className="mx-auto mb-8 h-24 w-24 bg-orange-500 rounded-full flex items-center justify-center shadow-2xl">
@@ -70,7 +73,9 @@ const Index = () => {
 
           {/* Description */}
           <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto mb-12">
-            Nous fournissons des solutions professionnelles d'ingénierie électrique adaptées pour répondre à vos besoins et défis spécifiques.
+            Nous fournissons des solutions professionnelles d'ingénierie
+            électrique adaptées pour répondre à vos besoins et défis
+            spécifiques.
           </p>
 
           {/* Boutons d'action */}

@@ -1,25 +1,35 @@
-
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
-import { SupabaseService } from '../services/SupabaseService';
-import { 
-  Bell, 
-  Calendar, 
-  Clock, 
-  Plus, 
-  Trash2, 
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
+import { SupabaseService } from "../services/SupabaseService";
+import {
+  Bell,
+  Calendar,
+  Clock,
+  Plus,
+  Trash2,
   AlertCircle,
   CheckCircle,
-  Settings
-} from 'lucide-react';
+  Settings,
+} from "lucide-react";
 
 interface NotificationManagerProps {
   isOpen: boolean;
@@ -42,15 +52,15 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
   isOpen,
   onClose,
   articleId,
-  articleTitle
+  articleTitle,
 }) => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [activeReminders, setActiveReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(false);
   const [isAddingReminder, setIsAddingReminder] = useState(false);
-  const [newReminderDate, setNewReminderDate] = useState('');
-  const [newReminderTime, setNewReminderTime] = useState('');
-  const [newReminderMessage, setNewReminderMessage] = useState('');
+  const [newReminderDate, setNewReminderDate] = useState("");
+  const [newReminderTime, setNewReminderTime] = useState("");
+  const [newReminderMessage, setNewReminderMessage] = useState("");
   const [autoCheckEnabled, setAutoCheckEnabled] = useState(true);
   const { toast } = useToast();
 
@@ -63,7 +73,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (autoCheckEnabled && isOpen) {
       interval = setInterval(() => {
         checkActiveReminders();
@@ -83,7 +93,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
       const activeData = await SupabaseService.getActiveReminders();
       setActiveReminders(activeData);
     } catch (error) {
-      console.error('Erreur lors du chargement des rappels:', error);
+      console.error("Erreur lors du chargement des rappels:", error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les rappels",
@@ -98,10 +108,10 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
     try {
       const activeData = await SupabaseService.getActiveReminders();
       setActiveReminders(activeData);
-      
+
       // Notifier l'utilisateur des rappels actifs
       if (activeData.length > 0) {
-        const newReminders = activeData.filter(reminder => !reminder.is_sent);
+        const newReminders = activeData.filter((reminder) => !reminder.is_sent);
         if (newReminders.length > 0) {
           toast({
             title: `${newReminders.length} rappel(s) actif(s)`,
@@ -111,12 +121,17 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
         }
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification des rappels:', error);
+      console.error("Erreur lors de la vérification des rappels:", error);
     }
   };
 
   const handleAddReminder = async () => {
-    if (!articleId || !newReminderDate || !newReminderTime || !newReminderMessage.trim()) {
+    if (
+      !articleId ||
+      !newReminderDate ||
+      !newReminderTime ||
+      !newReminderMessage.trim()
+    ) {
       toast({
         title: "Champs manquants",
         description: "Veuillez remplir tous les champs",
@@ -127,26 +142,26 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
 
     try {
       const reminderDateTime = `${newReminderDate}T${newReminderTime}:00`;
-      
+
       await SupabaseService.addReminder(
         articleId,
         reminderDateTime,
-        newReminderMessage
+        newReminderMessage,
       );
 
-      setNewReminderDate('');
-      setNewReminderTime('');
-      setNewReminderMessage('');
+      setNewReminderDate("");
+      setNewReminderTime("");
+      setNewReminderMessage("");
       setIsAddingReminder(false);
-      
+
       await loadReminders();
-      
+
       toast({
         title: "Rappel ajouté",
         description: "Le rappel a été programmé avec succès",
       });
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du rappel:', error);
+      console.error("Erreur lors de l'ajout du rappel:", error);
       toast({
         title: "Erreur",
         description: "Impossible d'ajouter le rappel",
@@ -159,13 +174,13 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
     try {
       await SupabaseService.markReminderAsSent(reminderId);
       await loadReminders();
-      
+
       toast({
         title: "Rappel marqué comme traité",
         description: "Le rappel a été marqué comme envoyé",
       });
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du rappel:', error);
+      console.error("Erreur lors de la mise à jour du rappel:", error);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le rappel",
@@ -175,12 +190,12 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
   };
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -199,9 +214,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
           <DialogTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
             Gestion des notifications et rappels
-            {articleTitle && (
-              <Badge variant="outline">{articleTitle}</Badge>
-            )}
+            {articleTitle && <Badge variant="outline">{articleTitle}</Badge>}
           </DialogTitle>
         </DialogHeader>
 
@@ -213,7 +226,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                 <AlertCircle className="h-5 w-5 text-red-500" />
                 Rappels actifs
                 <Badge variant="destructive">
-                  {activeReminders.filter(r => isReminderActive(r)).length}
+                  {activeReminders.filter((r) => isReminderActive(r)).length}
                 </Badge>
               </CardTitle>
               <CardDescription>
@@ -227,16 +240,18 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                 </div>
               )}
 
-              {!loading && activeReminders.filter(r => isReminderActive(r)).length === 0 && (
-                <div className="text-center py-8">
-                  <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <p className="text-gray-500">Aucun rappel actif</p>
-                </div>
-              )}
+              {!loading &&
+                activeReminders.filter((r) => isReminderActive(r)).length ===
+                  0 && (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <p className="text-gray-500">Aucun rappel actif</p>
+                  </div>
+                )}
 
               <div className="space-y-3">
                 {activeReminders
-                  .filter(r => isReminderActive(r))
+                  .filter((r) => isReminderActive(r))
                   .map((reminder) => (
                     <div
                       key={reminder.id}
@@ -299,7 +314,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                         type="date"
                         value={newReminderDate}
                         onChange={(e) => setNewReminderDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
+                        min={new Date().toISOString().split("T")[0]}
                       />
                     </div>
                     <div>
@@ -324,10 +339,14 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
                     />
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleAddReminder}
                     className="w-full"
-                    disabled={!newReminderDate || !newReminderTime || !newReminderMessage.trim()}
+                    disabled={
+                      !newReminderDate ||
+                      !newReminderTime ||
+                      !newReminderMessage.trim()
+                    }
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Ajouter le rappel
@@ -345,12 +364,13 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
               <Clock className="h-5 w-5 text-blue-500" />
               Rappels programmés
               <Badge variant="secondary">
-                {activeReminders.filter(r => isReminderPending(r)).length}
+                {activeReminders.filter((r) => isReminderPending(r)).length}
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {activeReminders.filter(r => isReminderPending(r)).length === 0 && (
+            {activeReminders.filter((r) => isReminderPending(r)).length ===
+              0 && (
               <p className="text-center text-gray-500 py-4">
                 Aucun rappel programmé
               </p>
@@ -358,7 +378,7 @@ export const NotificationManager: React.FC<NotificationManagerProps> = ({
 
             <div className="space-y-2">
               {activeReminders
-                .filter(r => isReminderPending(r))
+                .filter((r) => isReminderPending(r))
                 .map((reminder) => (
                   <div
                     key={reminder.id}

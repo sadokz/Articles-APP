@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { getCategories, getSousCategories } from '../api';
-import { Categorie, SousCategorie } from '../types/Article';
-import { useAuth } from '../contexts/AuthContext';
-import { Info } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { getCategories, getSousCategories } from "../api";
+import { Categorie, SousCategorie } from "../types/Article";
+import { useAuth } from "../contexts/AuthContext";
+import { Info } from "lucide-react";
 
 interface CategoryDescriptionProps {
   selectedCategory: string;
@@ -12,11 +12,12 @@ interface CategoryDescriptionProps {
 
 export const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
   selectedCategory,
-  selectedSousCategory
+  selectedSousCategory,
 }) => {
   const { token } = useAuth();
   const [categoryInfo, setCategoryInfo] = useState<Categorie | null>(null);
-  const [sousCategoryInfo, setSousCategoryInfo] = useState<SousCategorie | null>(null);
+  const [sousCategoryInfo, setSousCategoryInfo] =
+    useState<SousCategorie | null>(null);
 
   useEffect(() => {
     if (token) {
@@ -28,14 +29,16 @@ export const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
     if (!token) return;
 
     try {
-      if (selectedCategory && selectedCategory !== 'all') {
+      if (selectedCategory && selectedCategory !== "all") {
         const categories = await getCategories(token);
-        const category = categories.find(cat => cat.nom === selectedCategory);
+        const category = categories.find((cat) => cat.nom === selectedCategory);
         setCategoryInfo(category || null);
 
-        if (selectedSousCategory && selectedSousCategory !== 'all') {
+        if (selectedSousCategory && selectedSousCategory !== "all") {
           const sousCategories = await getSousCategories(token);
-          const sousCategory = sousCategories.find(sc => sc.nom === selectedSousCategory);
+          const sousCategory = sousCategories.find(
+            (sc) => sc.nom === selectedSousCategory,
+          );
           setSousCategoryInfo(sousCategory || null);
         } else {
           setSousCategoryInfo(null);
@@ -45,7 +48,10 @@ export const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
         setSousCategoryInfo(null);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des informations de catégorie:', error);
+      console.error(
+        "Erreur lors du chargement des informations de catégorie:",
+        error,
+      );
     }
   };
 

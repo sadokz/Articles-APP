@@ -1,11 +1,15 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Article } from '../types/Article';
-import { Download, File } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Article } from "../types/Article";
+import { Download, File } from "lucide-react";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -13,18 +17,22 @@ interface ExportModalProps {
   articles: Article[];
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, articles }) => {
+export const ExportModal: React.FC<ExportModalProps> = ({
+  isOpen,
+  onClose,
+  articles,
+}) => {
   const [selectedArticles, setSelectedArticles] = useState<number[]>([]);
-  const [exportFormat, setExportFormat] = useState<'excel' | 'word'>('excel');
+  const [exportFormat, setExportFormat] = useState<"excel" | "word">("excel");
 
   const toggleArticle = (id: number) => {
-    setSelectedArticles(prev =>
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    setSelectedArticles((prev) =>
+      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id],
     );
   };
 
   const selectAll = () => {
-    setSelectedArticles(articles.map(a => a.id!));
+    setSelectedArticles(articles.map((a) => a.id!));
   };
 
   const deselectAll = () => {
@@ -32,11 +40,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
   };
 
   const exportToCSV = () => {
-    const selectedData = articles.filter(a => selectedArticles.includes(a.id!));
-    const headers = ['Titre', 'Catégorie', 'Sous-catégorie', 'Prix', 'Unité', 'Description', 'Tags', 'Modifié par', 'Date modification'];
+    const selectedData = articles.filter((a) =>
+      selectedArticles.includes(a.id!),
+    );
+    const headers = [
+      "Titre",
+      "Catégorie",
+      "Sous-catégorie",
+      "Prix",
+      "Unité",
+      "Description",
+      "Tags",
+      "Modifié par",
+      "Date modification",
+    ];
     const csvContent = [
-      headers.join(','),
-      ...selectedData.map(article =>
+      headers.join(","),
+      ...selectedData.map((article) =>
         [
           `"${article.titre}"`,
           `"${article.categorie}"`,
@@ -44,23 +64,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
           article.prix,
           `"${article.unite}"`,
           `"${article.description}"`,
-          `"${article.tags?.join('; ') || ''}"`,
+          `"${article.tags?.join("; ") || ""}"`,
           `"${article.dernier_modifie_par}"`,
-          `"${new Date(article.date_modification).toLocaleDateString('fr-FR')}"`
-        ].join(',')
-      )
-    ].join('\n');
+          `"${new Date(article.date_modification).toLocaleDateString("fr-FR")}"`,
+        ].join(","),
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = 'articles_export.csv';
+    link.download = "articles_export.csv";
     link.click();
     URL.revokeObjectURL(link.href);
   };
 
   const exportToWord = () => {
-    const selectedData = articles.filter(a => selectedArticles.includes(a.id!));
+    const selectedData = articles.filter((a) =>
+      selectedArticles.includes(a.id!),
+    );
     let htmlContent = `
       <html>
         <head>
@@ -89,7 +111,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
             </tr>
     `;
 
-    selectedData.forEach(article => {
+    selectedData.forEach((article) => {
       htmlContent += `
         <tr>
           <td>${article.titre}</td>
@@ -98,9 +120,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
           <td>${article.prix}€</td>
           <td>${article.unite}</td>
           <td>${article.description}</td>
-          <td>${article.tags?.join(', ') || ''}</td>
+          <td>${article.tags?.join(", ") || ""}</td>
           <td>${article.dernier_modifie_par}</td>
-          <td>${new Date(article.date_modification).toLocaleDateString('fr-FR')}</td>
+          <td>${new Date(article.date_modification).toLocaleDateString("fr-FR")}</td>
         </tr>
       `;
     });
@@ -111,10 +133,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
       </html>
     `;
 
-    const blob = new Blob([htmlContent], { type: 'application/msword' });
-    const link = document.createElement('a');
+    const blob = new Blob([htmlContent], { type: "application/msword" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = 'articles_export.doc';
+    link.download = "articles_export.doc";
     link.click();
     URL.revokeObjectURL(link.href);
   };
@@ -122,7 +144,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
   const handleExport = () => {
     if (selectedArticles.length === 0) return;
 
-    if (exportFormat === 'excel') {
+    if (exportFormat === "excel") {
       exportToCSV();
     } else {
       exportToWord();
@@ -141,16 +163,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
         <div className="space-y-4">
           <div className="flex gap-4">
             <Button
-              variant={exportFormat === 'excel' ? 'default' : 'outline'}
-              onClick={() => setExportFormat('excel')}
+              variant={exportFormat === "excel" ? "default" : "outline"}
+              onClick={() => setExportFormat("excel")}
               className="flex items-center gap-2"
             >
               <File className="h-4 w-4" />
               Excel (CSV)
             </Button>
             <Button
-              variant={exportFormat === 'word' ? 'default' : 'outline'}
-              onClick={() => setExportFormat('word')}
+              variant={exportFormat === "word" ? "default" : "outline"}
+              onClick={() => setExportFormat("word")}
               className="flex items-center gap-2"
             >
               <File className="h-4 w-4" />
@@ -175,7 +197,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
                   checked={selectedArticles.includes(article.id!)}
                   onCheckedChange={() => toggleArticle(article.id!)}
                 />
-                <Label htmlFor={`article-${article.id}`} className="text-sm cursor-pointer">
+                <Label
+                  htmlFor={`article-${article.id}`}
+                  className="text-sm cursor-pointer"
+                >
                   {article.titre}
                 </Label>
               </div>
@@ -190,7 +215,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, artic
               <Button variant="outline" onClick={onClose}>
                 Annuler
               </Button>
-              <Button 
+              <Button
                 onClick={handleExport}
                 disabled={selectedArticles.length === 0}
                 className="bg-orange-500 hover:bg-orange-600"

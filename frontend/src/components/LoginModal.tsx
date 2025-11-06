@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useAuth } from "../contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -13,8 +19,8 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
@@ -32,15 +38,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: error instanceof Error ? error.message : "Une erreur est survenue",
+        description:
+          error instanceof Error ? error.message : "Une erreur est survenue",
         variant: "destructive",
       });
     }
   };
 
   const handleClose = () => {
-    setEmail('');
-    setPassword('');
+    setEmail("");
+    setPassword("");
     setShowPassword(false);
     onClose();
   };
@@ -82,7 +89,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <div className="relative">
               <Input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="Votre mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -109,7 +116,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 transition-all duration-200"
             disabled={isLoading}
           >
-            {isLoading ? 'Connexion...' : 'Se connecter'}
+            {isLoading ? "Connexion..." : "Se connecter"}
           </Button>
         </form>
       </DialogContent>

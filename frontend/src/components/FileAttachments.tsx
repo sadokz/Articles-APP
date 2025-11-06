@@ -1,21 +1,26 @@
-
-import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
-import { SupabaseService } from '../services/SupabaseService';
-import { 
-  Upload, 
-  File, 
-  Image, 
-  FileText, 
-  Download, 
-  Trash2, 
+import React, { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import { SupabaseService } from "../services/SupabaseService";
+import {
+  Upload,
+  File,
+  Image,
+  FileText,
+  Download,
+  Trash2,
   Eye,
-  Paperclip
-} from 'lucide-react';
+  Paperclip,
+} from "lucide-react";
 
 interface FileAttachment {
   name: string;
@@ -38,7 +43,15 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
   onAttachmentsChange,
   maxFiles = 10,
   maxSizePerFile = 10,
-  allowedTypes = ['image/*', 'application/pdf', 'text/*', '.doc', '.docx', '.xls', '.xlsx']
+  allowedTypes = [
+    "image/*",
+    "application/pdf",
+    "text/*",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+  ],
 }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -46,17 +59,17 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
   const { toast } = useToast();
 
   const parseAttachments = (): FileAttachment[] => {
-    return attachments.map(attachment => {
+    return attachments.map((attachment) => {
       try {
         return JSON.parse(attachment);
       } catch {
         // Format legacy - juste une URL
         return {
-          name: attachment.split('/').pop() || 'fichier',
+          name: attachment.split("/").pop() || "fichier",
           url: attachment,
-          type: 'unknown',
+          type: "unknown",
           size: 0,
-          uploadedAt: new Date().toISOString()
+          uploadedAt: new Date().toISOString(),
         };
       }
     });
@@ -66,12 +79,14 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     const currentAttachments = parseAttachments();
-    
+
     if (currentAttachments.length + files.length > maxFiles) {
       toast({
         title: "Limite atteinte",
@@ -83,14 +98,14 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
 
     setUploading(true);
     setUploadProgress(0);
-    
+
     try {
       const newAttachments: string[] = [];
       const totalFiles = files.length;
-      
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
+
         // Vérifier la taille
         if (file.size > maxSizePerFile * 1024 * 1024) {
           toast({
@@ -102,9 +117,9 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
         }
 
         // Vérifier le type
-        const isAllowed = allowedTypes.some(type => {
-          if (type.includes('*')) {
-            return file.type.startsWith(type.replace('*', ''));
+        const isAllowed = allowedTypes.some((type) => {
+          if (type.includes("*")) {
+            return file.type.startsWith(type.replace("*", ""));
           }
           return file.name.toLowerCase().endsWith(type) || file.type === type;
         });
@@ -119,21 +134,24 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
         }
 
         try {
-          const url = await SupabaseService.uploadFile(file, 'article-attachments');
-          
+          const url = await SupabaseService.uploadFile(
+            file,
+            "article-attachments",
+          );
+
           const attachment: FileAttachment = {
             name: file.name,
             url,
             type: file.type,
             size: file.size,
-            uploadedAt: new Date().toISOString()
+            uploadedAt: new Date().toISOString(),
           };
 
           newAttachments.push(JSON.stringify(attachment));
-          
+
           setUploadProgress(((i + 1) / totalFiles) * 100);
         } catch (error) {
-          console.error('Erreur upload:', error);
+          console.error("Erreur upload:", error);
           toast({
             title: "Erreur d'upload",
             description: `Impossible d'uploader ${file.name}`,
@@ -153,7 +171,7 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
       setUploading(false);
       setUploadProgress(0);
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = "";
       }
     }
   };
@@ -161,21 +179,21 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
   const handleRemoveAttachment = async (index: number) => {
     const attachmentsList = parseAttachments();
     const attachment = attachmentsList[index];
-    
+
     try {
       // Extraire le chemin du fichier depuis l'URL pour le supprimer du storage
-      const urlPath = attachment.url.split('/').slice(-2).join('/');
+      const urlPath = attachment.url.split("/").slice(-2).join("/");
       await SupabaseService.deleteFile(urlPath);
-      
+
       const newAttachments = attachments.filter((_, i) => i !== index);
       onAttachmentsChange(newAttachments);
-      
+
       toast({
         title: "Fichier supprimé",
         description: `${attachment.name} a été supprimé`,
       });
     } catch (error) {
-      console.error('Erreur suppression:', error);
+      console.error("Erreur suppression:", error);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le fichier",
@@ -185,26 +203,28 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
   };
 
   const getFileIcon = (type: string) => {
-    if (type.startsWith('image/')) return <Image className="h-4 w-4 text-blue-500" />;
-    if (type.includes('pdf')) return <FileText className="h-4 w-4 text-red-500" />;
+    if (type.startsWith("image/"))
+      return <Image className="h-4 w-4 text-blue-500" />;
+    if (type.includes("pdf"))
+      return <FileText className="h-4 w-4 text-red-500" />;
     return <File className="h-4 w-4 text-gray-500" />;
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return 'Taille inconnue';
+    if (bytes === 0) return "Taille inconnue";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -221,7 +241,8 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
           </Badge>
         </CardTitle>
         <CardDescription>
-          Ajoutez des fichiers à cet article (max {maxSizePerFile}MB par fichier)
+          Ajoutez des fichiers à cet article (max {maxSizePerFile}MB par
+          fichier)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -242,7 +263,7 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                   Glissez vos fichiers ici ou cliquez pour parcourir
                 </p>
-                <Button 
+                <Button
                   onClick={handleFileSelect}
                   disabled={currentAttachments.length >= maxFiles}
                   variant="outline"
@@ -260,7 +281,7 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
             ref={fileInputRef}
             type="file"
             multiple
-            accept={allowedTypes.join(',')}
+            accept={allowedTypes.join(",")}
             onChange={handleFileUpload}
             className="hidden"
           />
@@ -283,17 +304,18 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
                         {attachment.name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {formatFileSize(attachment.size)} • {formatDate(attachment.uploadedAt)}
+                        {formatFileSize(attachment.size)} •{" "}
+                        {formatDate(attachment.uploadedAt)}
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-1">
-                    {attachment.type.startsWith('image/') && (
+                    {attachment.type.startsWith("image/") && (
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => window.open(attachment.url, '_blank')}
+                        onClick={() => window.open(attachment.url, "_blank")}
                         title="Prévisualiser"
                       >
                         <Eye className="h-4 w-4" />
@@ -302,7 +324,7 @@ export const FileAttachments: React.FC<FileAttachmentsProps> = ({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => window.open(attachment.url, '_blank')}
+                      onClick={() => window.open(attachment.url, "_blank")}
                       title="Télécharger"
                     >
                       <Download className="h-4 w-4" />

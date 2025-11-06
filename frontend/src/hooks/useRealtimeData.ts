@@ -1,7 +1,6 @@
-
-import { useState, useEffect, useCallback } from 'react';
-import { SupabaseService } from '../services/SupabaseService';
-import { Article, Categorie, SousCategorie } from '../types/Article';
+import { useState, useEffect, useCallback } from "react";
+import { SupabaseService } from "../services/SupabaseService";
+import { Article, Categorie, SousCategorie } from "../types/Article";
 
 interface RealtimeDataState {
   articles: Article[];
@@ -17,45 +16,52 @@ export const useRealtimeData = () => {
     categories: [],
     sousCategories: [],
     loading: true,
-    error: null
+    error: null,
   });
 
   const loadData = useCallback(async () => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
-      const [articlesData, categoriesData, sousCategoriesData] = await Promise.all([
-        SupabaseService.getArticles(),
-        SupabaseService.getCategories(),
-        SupabaseService.getSousCategories()
-      ]);
-      
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+
+      const [articlesData, categoriesData, sousCategoriesData] =
+        await Promise.all([
+          SupabaseService.getArticles(),
+          SupabaseService.getCategories(),
+          SupabaseService.getSousCategories(),
+        ]);
+
       setState({
         articles: articlesData,
         categories: categoriesData,
         sousCategories: sousCategoriesData,
         loading: false,
-        error: null
+        error: null,
       });
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
-      setState(prev => ({
+      console.error("Erreur lors du chargement des données:", error);
+      setState((prev) => ({
         ...prev,
         loading: false,
-        error: 'Erreur lors du chargement des données'
+        error: "Erreur lors du chargement des données",
       }));
     }
   }, []);
 
-  const handleArticleChange = useCallback((event: any) => {
-    console.log('Article change event:', event.detail);
-    loadData(); // Recharger toutes les données pour la simplification
-  }, [loadData]);
+  const handleArticleChange = useCallback(
+    (event: any) => {
+      console.log("Article change event:", event.detail);
+      loadData(); // Recharger toutes les données pour la simplification
+    },
+    [loadData],
+  );
 
-  const handleCategoryChange = useCallback((event: any) => {
-    console.log('Category change event:', event.detail);
-    loadData(); // Recharger toutes les données pour la simplification
-  }, [loadData]);
+  const handleCategoryChange = useCallback(
+    (event: any) => {
+      console.log("Category change event:", event.detail);
+      loadData(); // Recharger toutes les données pour la simplification
+    },
+    [loadData],
+  );
 
   useEffect(() => {
     loadData();
@@ -63,17 +69,23 @@ export const useRealtimeData = () => {
 
   useEffect(() => {
     // Écouter les événements de changement en temps réel
-    window.addEventListener('supabase-article-change', handleArticleChange);
-    window.addEventListener('supabase-category-change', handleCategoryChange);
+    window.addEventListener("supabase-article-change", handleArticleChange);
+    window.addEventListener("supabase-category-change", handleCategoryChange);
 
     return () => {
-      window.removeEventListener('supabase-article-change', handleArticleChange);
-      window.removeEventListener('supabase-category-change', handleCategoryChange);
+      window.removeEventListener(
+        "supabase-article-change",
+        handleArticleChange,
+      );
+      window.removeEventListener(
+        "supabase-category-change",
+        handleCategoryChange,
+      );
     };
   }, [handleArticleChange, handleCategoryChange]);
 
   return {
     ...state,
-    refetch: loadData
+    refetch: loadData,
   };
 };

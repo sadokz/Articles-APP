@@ -116,5 +116,5 @@ export interface ExtendedUser {
   prenom: string;
   email: string;
   telephone: string;
-  niveau_acces: 'lecture_seule' | 'lecture_modification' | 'inactif';
+  niveau_acces: "lecture_seule" | "lecture_modification" | "inactif";
 }
